@@ -11,6 +11,11 @@
 #include "shader.h"
 #include "Mesh.h"
 #include "Node.h"
+#include "Animation.h"
+#include "Animator.h"
+
+
+
 
 static Shader shader;
 
@@ -30,12 +35,16 @@ float fov = 70.0;
 float near = 0.1;
 float far = 400.0;
 
+// timing
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+bool animate = true;
 
 GLuint blinnShader;
 GLuint texblinnShader;
 GLuint normalblinnShader;
 // GLuint boneShader;
-
+GLuint boneShader;
 // Initialize shader
 GLuint initShader(std::string pathVert, std::string pathFrag) 
 {
@@ -219,6 +228,11 @@ int main()
     //setLightPosition(lightPos);
     //setViewPosition(viewPos);
 
+    // boneShader
+    boneShader = initShader("shaders/bone.vert", "shaders/bone.frag");
+    setLightPosition(lightPos);
+    setViewPosition(viewPos);
+
     // set the eye at (0, 0, 5), looking at the centre of the world
     matView = glm::lookAt(viewPos, viewCenter, glm::vec3(0, 1, 0)); 
 
@@ -226,22 +240,46 @@ int main()
     matProj = glm::perspective(glm::radians(fov), wView / (float) hView, near, far);
 
     std::shared_ptr<Mesh> anim_model = std::make_shared<Mesh>();
-    anim_model->init("models/vampire/dancing_vampire.dae", texblinnShader);
-
+    anim_model->init("models/vampire/dancing_vampire.dae", boneShader);
+    Animation danceAnimation("models/vampire/dancing_vampire.dae", anim_model.get());
     // anim_model->init("models/mannequin/Capoeira_Mannequin.dae", texblinnShader);
    
+    Animator animator(&danceAnimation);
+
     // setting the background colour, you can change the value
     glClearColor(0.25f, 0.5f, 0.75f, 1.0f);
     
     glEnable(GL_DEPTH_TEST);
 
-     
+    if (animate) {
+        scale = glm::vec3(100.0, 100.0, 100.0);
+        matModelRoot = glm::scale(matModelRoot, scale);
+    }
+
     // setting the event loop
     while (!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
+        if (animate)
+            animator.UpdateAnimation(deltaTime);
+
+        glUseProgram(boneShader);
+
+        // update bone matrices in the shader
+        auto transforms = animator.GetFinalBoneMatrices();
+        for (int i = 0; i < transforms.size(); ++i) {
+            glm::mat4 mat = transforms[i];
+            std::string name = "finalBonesMatrices[" + std::to_string(i) + "]";
+            glUniformMatrix4fv(glGetUniformLocation(boneShader, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+
+        }
 
         anim_model->draw(matModelRoot, matView, matProj);
         
