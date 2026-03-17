@@ -96,17 +96,28 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
             if (GLFW_KEY_LEFT == key) {
                 mat = glm::translate(glm::mat4(1.0f), glm::vec3(transStep, 0.0f, 0.0f));
                 matModelRoot = mat * matModelRoot;
-            } else if (GLFW_KEY_RIGHT == key ) {
+            }
+            else if (GLFW_KEY_RIGHT == key) {
                 mat = glm::translate(glm::mat4(1.0f), glm::vec3(-transStep, 0.0f, 0.0f));
                 matModelRoot = mat * matModelRoot;
-            } else if (GLFW_KEY_UP == key) {
+            }
+            else if (GLFW_KEY_UP == key) {
                 mat = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, transStep, 0.0f));
                 matModelRoot = mat * matModelRoot;
             } if (GLFW_KEY_DOWN == key) {
                 mat = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -transStep, 0.0f));
                 matModelRoot = mat * matModelRoot;
-            }
+            };
         }
+// ZM1.1.3: Add something like this; ( This assigns Keybinds to swap animations)
+       /* if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+          animator.PlayAnimation(&danceAnimation);' 
+        if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+            animator.PlayAnimation(&walkAnimation);
+
+        if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+             animator.PlayAnimation(&idleAnimation);
+        }*/
 
         // camera control
         if (GLFW_KEY_LEFT == key) {
@@ -239,11 +250,15 @@ int main()
     // set the Y field of view angle to 60 degrees, width/height ratio to 1.0, and a near plane of 3.5, far plane of 6.5
     matProj = glm::perspective(glm::radians(fov), wView / (float) hView, near, far);
 
+    // ZM1.1: to add another animation just simply copy Animation line and then change it to new animation file path. then follow ZM1.1.2 Below. 
+	// ZM1.2: Make 2 models by copying below but changing the anim_model to different character name E.G Paladin_model with whatever animation.
     std::shared_ptr<Mesh> anim_model = std::make_shared<Mesh>();
     anim_model->init("models/vampire/dancing_vampire.dae", boneShader);
     Animation danceAnimation("models/vampire/dancing_vampire.dae", anim_model.get());
     // anim_model->init("models/mannequin/Capoeira_Mannequin.dae", texblinnShader);
    
+
+	// ZM1.1.2: Then copy the code below and add the new animation here. Then Follow ZM1.1.3 below for keybinds for switching animation.
     Animator animator(&danceAnimation);
 
     // setting the background colour, you can change the value
@@ -267,11 +282,13 @@ int main()
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
+// ZM1.3: add new character animator, copy and paste but change names.
         if (animate)
             animator.UpdateAnimation(deltaTime);
 
         glUseProgram(boneShader);
 
+// ZM1.4: Copy and past all below and change the name of the character animator to new one also, 'glfwSwapBuffers(window);' stays underneath all of it so dont copy.
         // update bone matrices in the shader
         auto transforms = animator.GetFinalBoneMatrices();
         for (int i = 0; i < transforms.size(); ++i) {
