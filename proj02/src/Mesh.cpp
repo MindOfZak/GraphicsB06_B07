@@ -205,7 +205,7 @@ void Mesh::initBuffer()
     glEnableVertexAttribArray(4);
     glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, bitangent));
 
-    /*
+    
     // >>>>>>>>>>>>>>>>>>>>>>>>>
     // ids
     glEnableVertexAttribArray(5);
@@ -215,7 +215,7 @@ void Mesh::initBuffer()
     glEnableVertexAttribArray(6);
     glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, weights));
     // <<<<<<<<<<<<<<<<<<<<<<<<<
-    */
+    
 
     // bind index buffer
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idxBufID);

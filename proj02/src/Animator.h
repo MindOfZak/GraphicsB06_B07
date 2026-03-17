@@ -6,7 +6,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
-#include "Bone.h"
+//#include "Bone.h"
 #include "Animation.h"
 
 class Animator
