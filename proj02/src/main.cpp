@@ -19,6 +19,10 @@
 
 static Shader shader;
 
+// Attempt 1 to add 2 characters to the scene with animations with on model matrix 
+glm::mat4 swatModelMatrix = glm::mat4(1.0f);
+glm::mat4 vampireModelMatrix = glm::mat4(1.0f);
+
 glm::mat4 matModelRoot = glm::mat4(1.0);
 glm::mat4 matView = glm::mat4(1.0);
 glm::mat4 matProj = glm::ortho(-2.0f,2.0f,-2.0f,2.0f, -2.0f,2.0f);
@@ -27,8 +31,8 @@ glm::vec3 scale = glm::vec3(1.0, 1.0, 1.0);
 
 // camera settings
 glm::vec3 lightPos = glm::vec3(200.0f, 300.0f, 200.0f);
-glm::vec3 viewPos = glm::vec3(0.0f, 100.0f, 200.0f);
-glm::vec3 viewCenter = glm::vec3(0.0f, 100.0f, 0.0f);
+glm::vec3 viewPos = glm::vec3(0.0f, 120.0f, 300.0f);
+glm::vec3 viewCenter = glm::vec3(30.0f, 80.0f, 0.0f);
 int wView = 800;
 int hView = 800;
 float fov = 70.0;
@@ -226,6 +230,8 @@ int main()
         return -1;
     }
 
+    
+
 
     blinnShader = initShader( "shaders/blinn.vert", "shaders/blinn.frag");
     setLightPosition(lightPos);
@@ -252,14 +258,36 @@ int main()
 
     // ZM1.1: to add another animation just simply copy Animation line and then change it to new animation file path. then follow ZM1.1.2 Below. 
 	// ZM1.2: Make 2 models by copying below but changing the anim_model to different character name E.G Paladin_model with whatever animation.
+    
+	// swat character animation
     std::shared_ptr<Mesh> swat_model = std::make_shared<Mesh>();
     swat_model->init("models/Surprise_Uppercut_Swat_Hit/SurpriseUppercutSwat.dae", boneShader);
     Animation SwatUppercutAnimation("models/Surprise_Uppercut_Swat_Hit/SurpriseUppercutSwat.dae", swat_model.get());
+
+	
+    // vampire character animation
+    std::shared_ptr<Mesh> vampire_model = std::make_shared<Mesh>();
+    vampire_model->init("models/Surprise_Uppercut_Vampire_Knocked/SurpriseUppercutVampire.dae", boneShader);
+    Animation VampireUppercutAnimation("models/Surprise_Uppercut_Vampire_Knocked/SurpriseUppercutVampire.dae", vampire_model.get());
     
    
 
 	// ZM1.1.2: Then copy the code below and add the new animation here. Then Follow ZM1.1.3 below for keybinds for switching animation.
-    Animator animator(&SwatUppercutAnimation);
+    Animator swatAnimator(&SwatUppercutAnimation);
+    Animator vampireAnimator(&VampireUppercutAnimation);
+
+    // swatModelMatrix
+    swatModelMatrix = glm::translate(swatModelMatrix, glm::vec3(-180.0f, 0.0f, 0.0f));
+    swatModelMatrix = glm::rotate(swatModelMatrix, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    swatModelMatrix = glm::scale(swatModelMatrix, glm::vec3(100.0f, 100.0f, 100.0f));
+    // vampireModelMatrix
+    vampireModelMatrix = glm::translate(vampireModelMatrix, glm::vec3(-120.0f, 0.0f, 0.0f));
+    vampireModelMatrix = glm::rotate(vampireModelMatrix, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    vampireModelMatrix = glm::scale(vampireModelMatrix, glm::vec3(100.0f, 100.0f, 100.0f));
+
+
+
+
 
     // setting the background colour, you can change the value
     glClearColor(0.25f, 0.5f, 0.75f, 1.0f);
@@ -284,22 +312,32 @@ int main()
 
 // ZM1.3: add new character animator, copy and paste but change names.
         if (animate)
-            animator.UpdateAnimation(deltaTime);
+        {
+            swatAnimator.UpdateAnimation(deltaTime);
+            vampireAnimator.UpdateAnimation(deltaTime);
+        }
 
         glUseProgram(boneShader);
 
 // ZM1.4: Copy and past all below and change the name of the character animator to new one also, 'glfwSwapBuffers(window);' stays underneath all of it so dont copy.
         // update bone matrices in the shader
-        auto transforms = animator.GetFinalBoneMatrices();
-        for (int i = 0; i < transforms.size(); ++i) {
-            glm::mat4 mat = transforms[i];
+        auto swatTransforms = swatAnimator.GetFinalBoneMatrices();
+        for (int i = 0; i < swatTransforms.size(); ++i) {
+            glm::mat4 mat = swatTransforms[i];
             std::string name = "finalBonesMatrices[" + std::to_string(i) + "]";
-            glUniformMatrix4fv(glGetUniformLocation(boneShader, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+            glUniformMatrix4fv(glGetUniformLocation(boneShader, name.c_str()), 1, GL_FALSE, &swatTransforms[i][0][0]);
 
         }
+        swat_model->draw(swatModelMatrix, matView, matProj);
 
-        swat_model->draw(matModelRoot, matView, matProj);
-        
+        auto vampireTransforms = vampireAnimator.GetFinalBoneMatrices();
+        for (int i = 0; i < vampireTransforms.size(); ++i) {
+            glm::mat4 mat = vampireTransforms[i];
+            std::string name = "finalBonesMatrices[" + std::to_string(i) + "]";
+            glUniformMatrix4fv(glGetUniformLocation(boneShader, name.c_str()), 1, GL_FALSE, &vampireTransforms[i][0][0]);
+
+        }
+        vampire_model->draw(vampireModelMatrix, matView, matProj);
         glfwSwapBuffers(window);
 
         //break;

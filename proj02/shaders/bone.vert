@@ -11,7 +11,7 @@ uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
 	
-const int MAX_BONES = 100;
+const int MAX_BONES = 150;
 const int MAX_BONE_INFLUENCE = 4;
 uniform mat4 finalBonesMatrices[MAX_BONES];
 	
@@ -22,6 +22,9 @@ out vec3 fragPos;
 void main()
 {
     vec4 totalPosition = vec4(0.0f);
+    vec3 totalNormal = vec3(0.0f);
+    
+    
     for(int i = 0 ; i < MAX_BONE_INFLUENCE ; i++)
     {
         if(boneIds[i] == -1) 
@@ -29,17 +32,25 @@ void main()
         if(boneIds[i] >=MAX_BONES) 
         {
             totalPosition = vec4(pos,1.0f);
+            totalNormal = norm;
             break;
         }
-        vec4 localPosition = finalBonesMatrices[boneIds[i]] * vec4(pos,1.0f);
-        
-        totalPosition += localPosition * weights[i];
-        normal = mat3(finalBonesMatrices[boneIds[i]]) * norm;
+       
+        mat4 boneTransform = finalBonesMatrices[boneIds[i]];
+        totalPosition += (boneTransform * vec4(pos, 1.0)) * weights[i];
+        totalNormal += (mat3(boneTransform) * norm) * weights[i];
     }
 		
-    mat4 viewModel = view * model;
-    gl_Position =  projection * viewModel * totalPosition;
+
+    vec4 worldPosition = model * totalPosition;
+    fragPos = vec3(worldPosition);
+
+
+    mat3 normalMatrix = transpose(inverse(mat3(model)));
+    normal = normalize(normalMatrix * totalNormal);
+    
+    texCoord = tex;
+    gl_Position =  projection * view * worldPosition;
 
     fragPos = vec3(model * vec4(pos, 1.0));
-    texCoord = tex;
 }
