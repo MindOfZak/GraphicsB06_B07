@@ -252,14 +252,14 @@ int main()
 
     // ZM1.1: to add another animation just simply copy Animation line and then change it to new animation file path. then follow ZM1.1.2 Below. 
 	// ZM1.2: Make 2 models by copying below but changing the anim_model to different character name E.G Paladin_model with whatever animation.
-    std::shared_ptr<Mesh> anim_model = std::make_shared<Mesh>();
-    anim_model->init("models/vampire/dancing_vampire.dae", boneShader);
-    Animation danceAnimation("models/vampire/dancing_vampire.dae", anim_model.get());
-    // anim_model->init("models/mannequin/Capoeira_Mannequin.dae", texblinnShader);
+    std::shared_ptr<Mesh> swat_model = std::make_shared<Mesh>();
+    swat_model->init("models/Surprise_Uppercut_Swat_Hit/SurpriseUppercutSwat.dae", boneShader);
+    Animation SwatUppercutAnimation("models/Surprise_Uppercut_Swat_Hit/SurpriseUppercutSwat.dae", swat_model.get());
+    
    
 
 	// ZM1.1.2: Then copy the code below and add the new animation here. Then Follow ZM1.1.3 below for keybinds for switching animation.
-    Animator animator(&danceAnimation);
+    Animator animator(&SwatUppercutAnimation);
 
     // setting the background colour, you can change the value
     glClearColor(0.25f, 0.5f, 0.75f, 1.0f);
@@ -298,7 +298,7 @@ int main()
 
         }
 
-        anim_model->draw(matModelRoot, matView, matProj);
+        swat_model->draw(matModelRoot, matView, matProj);
         
         glfwSwapBuffers(window);
 
