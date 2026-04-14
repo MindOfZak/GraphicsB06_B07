@@ -83,12 +83,13 @@ glm::vec3 ClothSim::getSpringForce(int direction, int id) {
 	// [TODO 1]: calculate spring force vector based on Hooke's law F = -k delta_x
 	// 1.1 calculate the length change delta_len
 	// replace 0 with your formula
-	float delta_len = 0;
+	float delta_len = lenSpring - lenRest;
 
 	// 1.2 Use Hooke's law F = -k * delta_len * vSpringUnit
 	// k : spring_factor
-	// replace glm::vec3(0.0) with your formula 
-	glm::vec3 spring_force = glm::vec3(0.0);
+	// replace glm::vec3(0.0) with your formula
+	
+	glm::vec3 spring_force = -spring_factor * delta_len * vSpringUnit;
 	return spring_force;
 }
 
@@ -176,7 +177,7 @@ void ClothSim::accumulateForces() {
 		glm::vec3 F_air_resistance = - air_resist_factor *  velocities[v] * glm::abs(glm::dot(normal, velocities[v]));
 
 		// Advanced: Test Sphere Intersection
-		float sphere_radius = 4.0f;
+		float sphere_radius = 1.0f;
 		float sphere_friction = 0.8f;
 		glm::vec3 sphere_center = glm::vec3(0, 4.0f, 0.0f);
 		
@@ -184,7 +185,7 @@ void ClothSim::accumulateForces() {
 
 		// [TODO 4]: sphere intesection
 		// 4.1 replace false with checking if the vertex position falls into the sphere
-		if ( false ) {
+		if (glm::length(mesh->vertices[v].pos - sphere_center) < sphere_radius) {
 
 			// if it is true: 
 			// push back the vertex position back to the sphere surface
@@ -202,6 +203,9 @@ void ClothSim::accumulateForces() {
 
 			// 4.5 downscale the vertex velocity using sphere_friction (< 1)
 			// velocities[v] *= ???;
+
+			mesh->vertices[v].pos = normalize(glm::vec3(mesh->vertices[v].pos - sphere_center)) * sphere_radius + sphere_center;
+			velocities[v] *= sphere_friction;
 		}
 
 
@@ -214,7 +218,7 @@ void ClothSim::accumulateForces() {
 			// F(v) = (gravity force) + (wind force) + (airresistance force, optional) + (spring force)
 			// [TODO 2]: accumulate gravity, wind, air resistance and spring forces
 			// replace 0 with your formula
-			forces[v] = glm::vec3(0);
+			forces[v] = spring + wind + F_air_resistance + gravity;
 		}
 
 		// Pinned vertices
@@ -238,10 +242,14 @@ void ClothSim::forwardEulerIntegration(float dt) {
 		glm::vec3 acceleration = forces[v] * 1.0f; // mass
 
 		// 3.1 update velocity using acceleration
-		// velocities[v] = damping_factor * velocities[v] + ??;
+		 velocities[v] = damping_factor * velocities[v] + acceleration * dt;
 
 		// 3.2 update position using velocity
-		// mesh->vertices[v].pos = ??;
+		  mesh->vertices[v].pos += velocities[v] * dt;
+
+		  if (mesh->vertices[v].pos.y < 0.0)
+		  if (mesh->vertices[v].pos.y < 0.0)
+			 mesh->vertices[v].pos.y = 0.0;
 	}
 }
 

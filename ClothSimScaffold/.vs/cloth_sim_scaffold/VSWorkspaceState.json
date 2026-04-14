@@ -1,0 +1,8 @@
+{
+  "OutputFoldersPerTargetSystem": {
+    "Local Machine": [
+      "cloth_sim_scaffold\\out\\build\\x64-Debug",
+      "cloth_sim_scaffold\\out\\install\\x64-Debug"
+    ]
+  }
+}
