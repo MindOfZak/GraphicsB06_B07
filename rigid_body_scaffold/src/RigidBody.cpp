@@ -26,7 +26,7 @@ void RigidBody::applyLinearForce(glm::vec3 force)
     if (! bDynamic) return;
 
     // TODO: 
-    // linearAcc += ???;
+     linearAcc += force / mass;
     
 }
 
@@ -37,7 +37,7 @@ void RigidBody::integrateLinearAcc(float dt)
     if (! bDynamic) return;
 
     // TODO:
-    // linearVel += ???;
+    linearVel += linearAcc * dt;
     
 
     // Reset linear and angular acceleration.
@@ -51,7 +51,7 @@ void RigidBody::integrateLinearVelocity(float dt)
     if (! bDynamic) return;
 
     // TODO:
-    // pos += ???;
+     pos += linearVel * dt;
     
 
     // reduce velocity a bit
@@ -65,7 +65,7 @@ void RigidBody::applyLinearImpulse(glm::vec3 impulse)
     if (! bDynamic) return;
 
     // TODO
-    // linearVel += ???;
+     linearVel += impulse / mass;
     
 }
 
