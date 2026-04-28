@@ -76,17 +76,37 @@ int main()
     std::cout << "3: Draw Particles Using Texure Sprites " << std::endl;
     std::cout << "==================================" << std::endl;
 
+    double now = glfwGetTime();
+    double last = now;
+    double accumulator = 0.0;
+
+    const double dt = 0.02;
+
 
     // setting the event loop
     while (!glfwWindowShouldClose(window))
     {
         if (nullptr == app.sim)  continue;
 
+        now = glfwGetTime();
+        double frameTime = now - last;
+        last = now;
+
+        accumulator += frameTime;
+
+        while (accumulator >= dt)
+        {
+            app.sim->tick(dt);
+            accumulator -= dt;
+        }
+
+
+
         glClear(GL_COLOR_BUFFER_BIT);
 
         // update simulation using 
         // a fixed time step
-        app.sim->tick(0.005);
+        app.sim->tick(dt);
 
         // draw the models
         app.sim->draw();

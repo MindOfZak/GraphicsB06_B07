@@ -106,12 +106,12 @@ void ParticleSystem::initBufPoints()
     glEnableVertexAttribArray(1);
     // [TODO] T1.1 
     // set the colour attribute using
-    // glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, ?? size_of_struct_Particle, ?? (void *) offset_of_color_in_Particle); 
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Particle), (void *) offsetof(Particle, color)); 
     // Hint: the last argument, i.e., offset of a field within Particle
     // can be obtained using (void*)offsetof(Particle, field_name)
 
 
-    glBindVertexArray(0);
+    glBindVertexArray(1);
 }
 
 
@@ -164,14 +164,14 @@ void ParticleSystem::tick(float dt)
     // [TODO] 2.3 Complete 
     // Binding the particle buffer from our square.
     // [TODO] 2.3.1 use glBindBufferBase to bind partBuf to location 0
-    // glBindBufferBase(GL_SHADER_STORAGE_BUFFER, ?? location, ?? our_particle_array);
+     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, partBuf);
 
 
     // [TODO] 2.3.2 run the compute shader
     // by calling void glDispatchCompute(num_grp_x,num_grp_y, num_grp_z)
     // here we set num_grp_x to the number of particles,
     // and num_grp_y and num_grp_z to 1
-    
+    glDispatchCompute(NUM_POINTS, 1, 1);
     // ask rendering wait for completion of the compute shader
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
