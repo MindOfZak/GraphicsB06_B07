@@ -48,7 +48,7 @@ void main() {
     // [TODO] 4 using texure sprites
     // T4.1 calcuate the scaling based on nxTex, nyTex
     // replace the following line with yours
-    vec2 uvScale = vec2(1.0, 1.0);
+    vec2 uvScale = vec2(1.0 / nxTex, 1.0 / nyTex);
 
     // calcuate the sprite index
     // the upper left corner represents the beginning of a particle
@@ -57,8 +57,8 @@ void main() {
     
     // T4.2 calcuate offset_x and offset_y of the sprite based on n
     // replace the next two lines with yours.
-    uint offset_x = 0;
-    uint offset_y = 0;
+    uint offset_x = n % nxTex;
+    uint offset_y = n / nxTex;
 
     // the sprite offset in the texture
     vec2 uvOffset = vec2(offset_x, offset_y) * uvScale;

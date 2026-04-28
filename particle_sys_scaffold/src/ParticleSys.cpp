@@ -197,14 +197,15 @@ void ParticleSystem::drawQuad()
     // [TODO] 3.1
     // call glBindBufferBase(GL_SHADER_STORAGE_BUFFER, ?? index, ?? buf);
     // bind buffer partBuf to location index 0
-    
+     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0 , partBuf);
+
     // [TODO] 3.2 
     // draw instanced quads as triangle strips  for all particles
     // call glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, ?? your_count, NUM_POINTS);
     // the missing count should be the number of quad vertices needed in the quad vertex buffer
     // in this example, we are drawing the quad as a triangle strip, only 4 vertices are needed.
     // if you are representing the quad as two triangles with 6 vertices, you may need to use 6.
-    // glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, ?? count, NUM_POINTS);
+     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, NUM_POINTS);
 
 
     glBindVertexArray(0);
@@ -238,13 +239,16 @@ void ParticleSystem::draw()
  
     // [TODO] 3.3 Enable Blending
     // T3.3.1 Enable blending by calling glEnable(GL_BLEND);
+    glEnable(GL_BLEND);
 
     // T3.3.2 specifiy the blend function using glBendFunc(src_factor, dst_factor)
     // the src_factor is normally GL_SRC_ALPHA
     // for rendeing fires with a black background, a dst_factor of GL_ONE is recommended
     // if you are going render smoke with a white background
     // you might need to use a dst_factor of GL_ONE_MINUS_SRC_ALPHA
-    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
+
 
     switch (drawMode)
     {

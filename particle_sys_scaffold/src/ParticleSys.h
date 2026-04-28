@@ -79,7 +79,7 @@ private:
 
     bool bPlaySim = true;
     // [TODO] T3.3.3 change NUM_POINTS from 8 to 1024
-    static const int NUM_POINTS = 8;
+    static const int NUM_POINTS = 1024;
     Particle particles[NUM_POINTS];
 
     std::shared_ptr<ShaderProgram> progPoint;  // render particles as points
