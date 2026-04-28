@@ -48,7 +48,7 @@ void respawn(inout Particle p, uint id) {
     // [TODO] 2.4.2 
     // make the fire spred over the X axis
     // by adding mulitples of dir.x to p.pos.x
-    // p.pos.x += ??;
+     p.pos.x += dir.x;
     
     // [TODO] 2.1.2 
     // set the initial velocity of the particle
