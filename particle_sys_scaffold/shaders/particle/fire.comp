@@ -104,7 +104,8 @@ void main() {
         // Fire colour : use mix(colour_red, colour_yellow, t) 
         // to achieve colour mixing between red and yellow
         // Hint: red (1.0, 0.0, 0.0), yellow (1.0, 1.0, 0.0)
-        vec3 color = vec3(1.0, 0.0, 0.0);
+        // vec3 color = vec3(1.0, 0.0, 0.0);
+        vec3 color = mix(vec3(1.0, 0.1, 0.0), vec3(1.0, 1.0, 0.0), t);
 
         p.color = vec4(color, 1.0);
     }
