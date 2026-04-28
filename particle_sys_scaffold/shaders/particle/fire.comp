@@ -1,0 +1,113 @@
+#version 430
+
+layout(local_size_x = 256) in;
+
+struct Particle {
+    vec4 pos;
+    vec4 velocity;
+    vec4 color;
+    float life;
+    float maxLife;
+    int padding1;
+    int padding2;
+};
+
+layout(std430, binding = 0) buffer Particles {
+    Particle particles[];
+};
+
+uniform float dt;        // delta time
+uniform vec3 basePos;    // fire source
+uniform float time;      // global time
+uniform vec3 acc;        // particle acceleration
+
+// Simple pseudo-random generator
+float rand(float seed) {
+    return fract(sin(seed) * 43758.5453);
+}
+
+// Generate random direction
+vec3 randomDir(float seed) {
+    float x = rand(seed) * 2.0 - 1.0;
+    float y = rand(seed + 1.0);
+    float z = rand(seed + 2.0) * 2.0 - 1.0;
+    return normalize(vec3(x, y, z));
+}
+
+void respawn(inout Particle p, uint id) {
+    float seed = float(id) + time;
+
+    // a random direction
+    vec3 dir = randomDir(seed);
+    
+    // [TODO] 2.1.1
+    // set the initial position of the Particle
+    // to basePos
+    // p.pos.xyz = ??;
+    
+    // [TODO] 2.4.2 
+    // make the fire spred over the X axis
+    // by adding mulitples of dir.x to p.pos.x
+    // p.pos.x += ??;
+    
+    // [TODO] 2.1.2 
+    // set the initial velocity of the particle
+    // to (dir.x, 1.0 + dir.y, dir.z)
+    // using 1.0 + dir.y for the velocity.y is to 
+    // give the particle an initial upward speed
+    // to achieve fire rising upward
+    p.velocity.xyz = vec3(0.0f);
+
+    // set the initial particle colour to white
+    p.color = vec4(1.0, 1.0, 1.0, 1.0);
+
+    // set the life span of a particle to a random value
+    p.maxLife = 1.0 + rand(seed) * 2.0;
+    // set the remaining life time of a particle
+    p.life = p.maxLife;
+}
+
+void main() {
+    uint id = gl_GlobalInvocationID.x;
+    Particle p = particles[id];
+
+    if (p.life <= 0.000001) {
+        // the branch for particle init 
+        respawn(p, id);
+    } else {
+        // the branch for particle update
+
+        // Decrease life
+        p.life -= dt;
+
+        // [TODO] 2.2.1 
+        // Upward acceleration (buoyancy)
+        // add the product of acc.y and dt to p.velocity.y
+        //p.velocity.y += ??;
+
+        // a random value between (-0.5, 0.5)
+        float noise = rand(float(id) + time) - 0.5 ;
+
+        // Add turbulence to velocity.x and .z
+        p.velocity.x += noise * acc.x * dt;
+        p.velocity.z += noise * acc.z * dt;
+
+        // [TODO] 2.2.2
+        // Update position based on the product of
+        // velocity and dt
+        // p.pos.xyz += ??;
+
+        // life parameter t in [1, 0]
+        float t = p.life / p.maxLife;
+
+        // [TODO] 2.4.1
+        // Fire colour : use mix(colour_red, colour_yellow, t) 
+        // to achieve colour mixing between red and yellow
+        // Hint: red (1.0, 0.0, 0.0), yellow (1.0, 1.0, 0.0)
+        vec3 color = vec3(1.0, 0.0, 0.0);
+
+        p.color = vec4(color, 1.0);
+    }
+
+    particles[id] = p;
+}
