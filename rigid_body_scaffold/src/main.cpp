@@ -136,6 +136,7 @@ void init_twoBall(glm::vec3 v = glm::vec3(0.0f))
     app.sim->add(planeObj);
 }
 
+// My Attempt at making a snooker table, not sure if it works yet
 void init_snooker() {
     app.sim->clear();
 
@@ -143,35 +144,93 @@ void init_snooker() {
     std::shared_ptr<SphereMesh> ball = std::make_shared<SphereMesh>(20, 20, radius);
     ball->setShaderId(blinnShader);
 
-    std::shared_ptr<RigidSphere> ball1 = std::make_shared<RigidSphere>(radius);
-    ball1->setMesh(ball);
-    std::shared_ptr<RigidBody> ball1Obj = std::dynamic_pointer_cast<RigidBody>(ball1);
-    ball1Obj->setPosition(glm::vec3(0.0f, 60.0f, 0.0f));
-    ball1Obj->setMass(0.1);
-    ball1Obj->setVelocity(glm::vec3(-0.0, -10.0f, 0.0f));
-    app.sim->add(ball1Obj);
-
-
-    float width = 100.0f;
+    float width = 140.0f;
     float length = 100.0f;
 
     std::shared_ptr<PlaneMesh> planeMesh = std::make_shared<PlaneMesh>(PlaneMesh::XZ, width, length, 10, 10, -width / 2.0, -length / 2.0);
     planeMesh->setShaderId(blinnShader);
     planeMesh->initBuffer();
 
-    for (int i = 0; i < 5; i++)
-        for (int j = 0; j < i + 1; j++)
-        {
-            std::shared_ptr<RigidSphere> ballx = std::make_shared<RigidSphere>(radius);
-            ballx->setMesh(ball);
-            std::shared_ptr<RigidBody> ballxObj = std::dynamic_pointer_cast<RigidBody>(ballx);
-            ballxObj->setPosition(glm::vec3(0 + (-i / 2.0 + j) * radius * 2, 20.0f - i * 2 * radius, 0.0f));
-            //ball2Obj->setVelocity(glm::vec3(-0.5, 0.0f, 0.0f));
-            ballxObj->setUseGravity(false);
-            app.sim->add(ballxObj);
-        }
+    std::shared_ptr <RigidPlane> table =
+        std::make_shared<RigidPlane>(width, length, -4.0f);
 
-    std::shared_ptr<RigidPlane> planeRigid = std::make_shared<RigidPlane>(width, length, -40.0f);
+    table->setDynamic(false);
+    table->setMesh(planeMesh);
+
+
+    std::shared_ptr<RigidBody> tableObj =
+        std::dynamic_pointer_cast<RigidBody>(table);
+
+    app.sim->add(tableObj);
+
+    // cue Ball Code
+
+	std::shared_ptr<RigidSphere> cueBall = std::make_shared<RigidSphere>(radius);
+    cueBall->setMesh(ball);
+
+    std::shared_ptr<RigidBody> cueObj = 
+		std::dynamic_pointer_cast<RigidBody>(cueBall);
+
+	cueObj->setPosition(glm::vec3(-45.0f, 0.0f, 0.0f));
+	cueObj->setVelocity(glm::vec3(35.0f, 0.0f, 0.0f));
+	cueObj->setMass(1.0f);
+	cueObj->setUseGravity(false);
+
+    app.sim->add(cueObj);
+
+    // the balls that are in a triangle
+
+	glm::vec3 rackStart = glm::vec3(20.0f, 0.0f, 0.0f);
+
+    for (int row = 0; row < 5; row++) {
+        for (int col = 0; col <= row; col++) {
+           
+            std::shared_ptr<RigidSphere> rackBall = 
+                std::make_shared<RigidSphere>(radius);
+            
+            rackBall->setMesh(ball);
+            
+            std::shared_ptr<RigidBody> rackObj = 
+                std::dynamic_pointer_cast<RigidBody>(rackBall);
+            
+            float x = rackStart.x + row * radius * 2.0f;
+			float y = 0.0f;
+			float z = rackStart.z + (col - row * 0.5f) * radius * 2.1f;
+            
+            rackObj->setPosition(glm::vec3(x, y, z));
+            rackObj->setVelocity(glm::vec3(0.0f));
+			rackObj->setMass(1.0f);
+            rackObj->setUseGravity(false);
+            app.sim->add(rackObj);
+        }
+    }
+
+    /*std::shared_ptr<RigidSphere> ball1 = std::make_shared<RigidSphere>(radius);
+    ball1->setMesh(ball);
+    std::shared_ptr<RigidBody> ball1Obj = std::dynamic_pointer_cast<RigidBody>(ball1);
+    ball1Obj->setPosition(glm::vec3(0.0f, 60.0f, 0.0f));
+    ball1Obj->setMass(0.1);
+    ball1Obj->setVelocity(glm::vec3(-0.0, -10.0f, 0.0f));
+    app.sim->add(ball1Obj);*/
+
+
+    
+    //for (int i = 0; i < 5; i++)
+    //    for (int j = 0; j < i + 1; j++)
+    //    {
+    //        std::shared_ptr<RigidSphere> ballx = std::make_shared<RigidSphere>(radius);
+    //        ballx->setMesh(ball);
+    //        std::shared_ptr<RigidBody> ballxObj = std::dynamic_pointer_cast<RigidBody>(ballx);
+    //        ballxObj->setPosition(glm::vec3(0 + (-i / 2.0 + j) * radius * 2, 20.0f - i * 2 * radius, 0.0f));
+    //        //ball2Obj->setVelocity(glm::vec3(-0.5, 0.0f, 0.0f));
+    //        ballxObj->setUseGravity(false);
+    //        app.sim->add(ballxObj);
+    //    }
+
+    
+
+    
+    /*std::shared_ptr<RigidPlane> planeRigid = std::make_shared<RigidPlane>(width, length, -40.0f);
     planeRigid->setDynamic(false);
     planeRigid->setMesh(planeMesh);
     std::shared_ptr<RigidBody> planeObj = std::dynamic_pointer_cast<RigidBody>(planeRigid);
@@ -183,7 +242,7 @@ void init_snooker() {
     planeRigid_top->setDynamic(false);
     planeRigid_top->setMesh(planeMesh);
     std::shared_ptr<RigidBody> planeObj_top = std::dynamic_pointer_cast<RigidBody>(planeRigid_top);
-    app.sim->add(planeObj_top);
+    app.sim->add(planeObj_top);*/
 }
 
 void clearScene() 
