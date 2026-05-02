@@ -15,12 +15,12 @@ void RigidSim::tick(float dt)
 
             // TODO 2.1 : apply gravity force
             // call RigidBody::applyLinearForce() and the vector RigidSim::GRAVITY
-            
+            obj->applyLinearForce(GRAVITY);
         }
 
         // TODO 2.2: Integrate acceleration 
         // call RigidBody::integrateAcc() to update object velocity
-       
+        obj->integrateAcc(dt);
     }
 
     // collision detection and collision response
@@ -33,13 +33,13 @@ void RigidSim::tick(float dt)
         // TODO 2.3: call RigidBody::testCollisionWith()
         // to check if two rigid body objects collides, and return CollisionInfo
         // replace the following line with your own code.
-        CollisionInfo info;
+		CollisionInfo info = obj1->testCollisionWith(obj2);
         // CollisionInfo info = ???; 
 
         if (info.bColliding) {
             // TODO 2.4: call collisionResponse(RigidBody, RigidBody, CollisionInfo)
             // to achieve impulse based collision effects
-            
+            collisionResponse(obj1, obj2, info);
         }
     }
 
@@ -47,7 +47,7 @@ void RigidSim::tick(float dt)
     for (auto& obj : objList) {
         // TODO 2.5 
         // call RigidBody::integrateVelocity() to update object position
-        
+        obj->integrateVelocity(dt);
     }
 
 }
@@ -140,7 +140,7 @@ void RigidSim::collisionResponse(std::shared_ptr<RigidBody> a, std::shared_ptr<R
             // TODO 3.1: calculate the full dominator as
             // (1.0f / a->mass) + (1.0f / b->mass)
             
-            // denom = ???;
+            denom = (1.0f / a->mass) + (1.0f / b->mass);
 
 
             // push objects a part from the midpoint of penetration
@@ -161,13 +161,13 @@ void RigidSim::collisionResponse(std::shared_ptr<RigidBody> a, std::shared_ptr<R
     // to push them apart. It's the reaction of the collision.
     // TODO 3.2 : calculate the relative velocity of a and b
     // using a's linear velocity minus b's linear velocity
-    glm::vec3 relativeVel = glm::vec3(0.0);
-    // relativeVel = ???;
+	glm::vec3 relativeVel = a->linearVel - b->linearVel;
+    
 
     // TODO 3.3 : calculate magnitude of the impulse J
     // using a->elastiy, relativeVel, normal and denom
     
-    // J = ???
+	J = -(1.0f + a->elasity) * glm::dot(relativeVel, normal) / denom;
     
     // the impulse vector has the direction of the normal 
     glm::vec3 impulse = J * normal;

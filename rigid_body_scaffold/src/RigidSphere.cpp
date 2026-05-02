@@ -40,14 +40,14 @@ CollisionInfo RigidSphere::testCollisionWith(std::shared_ptr<RigidSphere> rb2) {
 
     // TODO 4.1: distance between two sphere centre
     float dist = 0.0f;
-    //dist = ???;
+    dist = glm::length(vPos);
 
     // TODO 4.2: contact surface normal is the normalisation of vPos
-    //info.normal = ???;
+    info.normal = glm::normalize(vPos);
 
     // TODO 4.3: penetration depth
-    info.peneDepth = r + rb2->r - dist;
-    // info.peneDepth = ???;
+    
+	info.peneDepth = r + rb2->r - dist;
 
     if (info.peneDepth > 0)  {
         // two spheres are colliding
