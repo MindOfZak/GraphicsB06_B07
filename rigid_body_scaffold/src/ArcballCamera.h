@@ -96,7 +96,7 @@ public:
 
         rotation = glm::quat(1,0,0,0); 
         // UpdateView();
-        matView = glm::lookAt(eye, target, glm::vec3(0,1,0));
+        matView = glm::lookAt(eye, target, up);
     }
 
     const glm::mat4& GetView()     const { return matView; }

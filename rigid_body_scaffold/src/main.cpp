@@ -39,6 +39,8 @@ int height = 800;
 
 bool bWireframe = false;
 
+std::shared_ptr<RigidBody> cueBallObj = nullptr;
+
 
 
 // Initialize shader
@@ -164,8 +166,8 @@ void init_snooker() {
         return body;
         };
 
-    float width = 140.0f;
-    float length = 100.0f;
+    float width = 300.0f;
+    float length = 180.0f;
 
     std::shared_ptr<PlaneMesh> planeMesh =
         std::make_shared<PlaneMesh>(
@@ -194,12 +196,12 @@ void init_snooker() {
     app.sim->add(tableObj);
 
     // cue ball
-    auto cueObj = makeBall(glm::vec3(1.0f, 1.0f, 1.0f));
+    cueBallObj = makeBall(glm::vec3(1.0f, 1.0f, 1.0f));
 
-    cueObj->setPosition(glm::vec3(-45.0f, 0.0f, 0.0f));
-    cueObj->setVelocity(glm::vec3(35.0f, 0.0f, 0.0f));
+    cueBallObj->setPosition(glm::vec3(-120.0f, 0.0f, 0.0f));
+    cueBallObj->setVelocity(glm::vec3(35.0f, 0.0f, 0.0f));
 
-    app.sim->add(cueObj);
+    app.sim->add(cueBallObj);
 
     // pool ball colours
     std::vector<glm::vec3> poolColours = {
@@ -221,7 +223,7 @@ void init_snooker() {
     };
 
     // triangle rack
-    glm::vec3 rackStart = glm::vec3(20.0f, 0.0f, 0.0f);
+    glm::vec3 rackStart = glm::vec3(60.0f, 0.0f, 0.0f);
 
     int colourIndex = 0;
 
@@ -242,45 +244,6 @@ void init_snooker() {
             colourIndex++;
         }
     }
-
-    /*std::shared_ptr<RigidSphere> ball1 = std::make_shared<RigidSphere>(radius);
-    ball1->setMesh(ball);
-    std::shared_ptr<RigidBody> ball1Obj = std::dynamic_pointer_cast<RigidBody>(ball1);
-    ball1Obj->setPosition(glm::vec3(0.0f, 60.0f, 0.0f));
-    ball1Obj->setMass(0.1);
-    ball1Obj->setVelocity(glm::vec3(-0.0, -10.0f, 0.0f));
-    app.sim->add(ball1Obj);*/
-
-
-    
-    //for (int i = 0; i < 5; i++)
-    //    for (int j = 0; j < i + 1; j++)
-    //    {
-    //        std::shared_ptr<RigidSphere> ballx = std::make_shared<RigidSphere>(radius);
-    //        ballx->setMesh(ball);
-    //        std::shared_ptr<RigidBody> ballxObj = std::dynamic_pointer_cast<RigidBody>(ballx);
-    //        ballxObj->setPosition(glm::vec3(0 + (-i / 2.0 + j) * radius * 2, 20.0f - i * 2 * radius, 0.0f));
-    //        //ball2Obj->setVelocity(glm::vec3(-0.5, 0.0f, 0.0f));
-    //        ballxObj->setUseGravity(false);
-    //        app.sim->add(ballxObj);
-    //    }
-
-    
-
-    
-    /*std::shared_ptr<RigidPlane> planeRigid = std::make_shared<RigidPlane>(width, length, -40.0f);
-    planeRigid->setDynamic(false);
-    planeRigid->setMesh(planeMesh);
-    std::shared_ptr<RigidBody> planeObj = std::dynamic_pointer_cast<RigidBody>(planeRigid);
-    app.sim->add(planeObj);
-
-
-
-    std::shared_ptr<RigidPlane> planeRigid_top = std::make_shared<RigidPlane>(width, length, -70.0f, glm::vec3(0.0f, -1.0f, 0.0f));
-    planeRigid_top->setDynamic(false);
-    planeRigid_top->setMesh(planeMesh);
-    std::shared_ptr<RigidBody> planeObj_top = std::dynamic_pointer_cast<RigidBody>(planeRigid_top);
-    app.sim->add(planeObj_top);*/
 }
 
 void clearScene() 
@@ -296,6 +259,10 @@ void key_callback_sim(GLFWwindow* window, int key, int scancode, int action, int
         // Controls
         if (GLFW_KEY_SPACE == key) {
            app.sim->setPlaySim(true);
+
+           if (cueBallObj != nullptr) {
+               cueBallObj->applyLinearImpulse(glm::vec3(35.0f, 0.0f, 0.0f));
+		   }
         } else if (GLFW_KEY_1 == key) {
             init_singleBall();
         } else if (GLFW_KEY_2 == key) {
@@ -308,6 +275,14 @@ void key_callback_sim(GLFWwindow* window, int key, int scancode, int action, int
             init_twoBall(glm::vec3(0.0f));
         } else if (GLFW_KEY_6 == key) {
             init_snooker();
+
+            app.camera->reset(
+                glm::vec3(0.0f, 350.0f, 0.1f),  // top down view
+                glm::vec3(0.0f, 0.0f, 0.0f),  // almost centre of table view
+                glm::vec3(0.0f, 0.0f, -1.0f)   // up vector along z axis
+            );
+
+            setViewPosition(app.camera->eye);
         } if (GLFW_KEY_R == key) {
            app.sim->clear();
            app.camera->reset(viewPos_default,
@@ -328,13 +303,13 @@ int main()
     GLFWwindow *window = app.glWin->getGLFWwin();
 
     app.camera = std::make_shared<ArcballCamera>(
-        viewPos_default,
-        glm::vec3(0,0,0),  // target
-        200.0f,            // distance
-        60.0f,             // FOV
+        glm::vec3(0.0f,300.0f,0.1f),  // top down view
+		glm::vec3(0, 0, 0),  // almost centre of table view
+        300.0f,            // camera distance
+        45.0f,             // FOV
         float(width) / float(height),
         0.1f,
-        1000.0f
+        2000.0f
     );
 
     blinnShader = initShader("shaders/blinn.vert", "shaders/blinn.frag");
