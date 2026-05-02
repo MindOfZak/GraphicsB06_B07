@@ -60,7 +60,10 @@ public:
     void initSpatial(bool useOctree, glm::mat4 mat);
     void setPicked(bool b) { bPicked = b; }
 
-
+    // Zaks added this:
+    // this is for snooker game
+    glm::vec3 objectColour = glm::vec3(1.0f, 0.0f, 0.0f);
+	void setColour(glm::vec3 colour) { objectColour = colour; }
 
 };
 

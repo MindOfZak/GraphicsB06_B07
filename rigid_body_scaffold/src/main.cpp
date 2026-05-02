@@ -141,67 +141,105 @@ void init_snooker() {
     app.sim->clear();
 
     float radius = 4.0f;
-    std::shared_ptr<SphereMesh> ball = std::make_shared<SphereMesh>(20, 20, radius);
-    ball->setShaderId(blinnShader);
+
+    auto makeBall = [&](glm::vec3 colour) {
+        std::shared_ptr<SphereMesh> mesh =
+            std::make_shared<SphereMesh>(20, 20, radius);
+
+        mesh->setShaderId(blinnShader);
+        mesh->setColour(colour);
+        mesh->initBuffer();
+
+        std::shared_ptr<RigidSphere> sphere =
+            std::make_shared<RigidSphere>(radius);
+
+        sphere->setMesh(mesh);
+
+        std::shared_ptr<RigidBody> body =
+            std::dynamic_pointer_cast<RigidBody>(sphere);
+
+        body->setMass(1.0f);
+        body->setUseGravity(false);
+
+        return body;
+        };
 
     float width = 140.0f;
     float length = 100.0f;
 
-    std::shared_ptr<PlaneMesh> planeMesh = std::make_shared<PlaneMesh>(PlaneMesh::XZ, width, length, 10, 10, -width / 2.0, -length / 2.0);
+    std::shared_ptr<PlaneMesh> planeMesh =
+        std::make_shared<PlaneMesh>(
+            PlaneMesh::XZ,
+            width,
+            length,
+            10,
+            10,
+            -width / 2.0f,
+            -length / 2.0f
+        );
+
     planeMesh->setShaderId(blinnShader);
+    planeMesh->setColour(glm::vec3(0.0f, 0.45f, 0.0f));
     planeMesh->initBuffer();
 
-    std::shared_ptr <RigidPlane> table =
+    std::shared_ptr<RigidPlane> table =
         std::make_shared<RigidPlane>(width, length, -4.0f);
 
     table->setDynamic(false);
     table->setMesh(planeMesh);
-
 
     std::shared_ptr<RigidBody> tableObj =
         std::dynamic_pointer_cast<RigidBody>(table);
 
     app.sim->add(tableObj);
 
-    // cue Ball Code
+    // cue ball
+    auto cueObj = makeBall(glm::vec3(1.0f, 1.0f, 1.0f));
 
-	std::shared_ptr<RigidSphere> cueBall = std::make_shared<RigidSphere>(radius);
-    cueBall->setMesh(ball);
-
-    std::shared_ptr<RigidBody> cueObj = 
-		std::dynamic_pointer_cast<RigidBody>(cueBall);
-
-	cueObj->setPosition(glm::vec3(-45.0f, 0.0f, 0.0f));
-	cueObj->setVelocity(glm::vec3(35.0f, 0.0f, 0.0f));
-	cueObj->setMass(1.0f);
-	cueObj->setUseGravity(false);
+    cueObj->setPosition(glm::vec3(-45.0f, 0.0f, 0.0f));
+    cueObj->setVelocity(glm::vec3(35.0f, 0.0f, 0.0f));
 
     app.sim->add(cueObj);
 
-    // the balls that are in a triangle
+    // pool ball colours
+    std::vector<glm::vec3> poolColours = {
+        glm::vec3(1.0f, 1.0f, 0.0f),   // yellow
+        glm::vec3(0.0f, 0.1f, 1.0f),   // blue
+        glm::vec3(1.0f, 0.0f, 0.0f),   // red
+        glm::vec3(0.5f, 0.0f, 0.8f),   // purple
+        glm::vec3(1.0f, 0.45f, 0.0f),  // orange
+        glm::vec3(0.0f, 0.6f, 0.0f),   // green
+        glm::vec3(0.5f, 0.0f, 0.0f),   // maroon
+        glm::vec3(0.0f, 0.0f, 0.0f),   // black
+        glm::vec3(1.0f, 1.0f, 0.0f),   // yellow
+        glm::vec3(0.0f, 0.1f, 1.0f),   // blue
+        glm::vec3(1.0f, 0.0f, 0.0f),   // red
+        glm::vec3(0.5f, 0.0f, 0.8f),   // purple
+        glm::vec3(1.0f, 0.45f, 0.0f),  // orange
+        glm::vec3(0.0f, 0.6f, 0.0f),   // green
+        glm::vec3(0.5f, 0.0f, 0.0f)    // maroon
+    };
 
-	glm::vec3 rackStart = glm::vec3(20.0f, 0.0f, 0.0f);
+    // triangle rack
+    glm::vec3 rackStart = glm::vec3(20.0f, 0.0f, 0.0f);
+
+    int colourIndex = 0;
 
     for (int row = 0; row < 5; row++) {
         for (int col = 0; col <= row; col++) {
-           
-            std::shared_ptr<RigidSphere> rackBall = 
-                std::make_shared<RigidSphere>(radius);
-            
-            rackBall->setMesh(ball);
-            
-            std::shared_ptr<RigidBody> rackObj = 
-                std::dynamic_pointer_cast<RigidBody>(rackBall);
-            
+
+            auto rackObj = makeBall(poolColours[colourIndex]);
+
             float x = rackStart.x + row * radius * 2.0f;
-			float y = 0.0f;
-			float z = rackStart.z + (col - row * 0.5f) * radius * 2.1f;
-            
+            float y = 0.0f;
+            float z = rackStart.z + (col - row * 0.5f) * radius * 2.1f;
+
             rackObj->setPosition(glm::vec3(x, y, z));
             rackObj->setVelocity(glm::vec3(0.0f));
-			rackObj->setMass(1.0f);
-            rackObj->setUseGravity(false);
+
             app.sim->add(rackObj);
+
+            colourIndex++;
         }
     }
 

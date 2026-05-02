@@ -6,6 +6,7 @@ in vec3 normal;
 
 uniform vec3 lightPos;
 uniform vec3 viewPos;
+uniform vec3 objectColour;
 
 out vec4 colour_out;
 
@@ -16,7 +17,13 @@ void main()
     //colour_out = vec4(colour_vert, 1.0);
 
     // manually set R G B of the surface colour, here is RED
-    vec3 colour = vec3(1.0, 0.0, 0.0);
+    // vec3 colour = vec3(1.0, 0.0, 0.0);
+
+    
+    // Zaks added this:
+    // use the colour of the object passed in as a uniform variable for snooker game 
+    
+    vec3 colour = objectColour;
 
     // 1. ambient
     vec3 ambient = 0.05 * colour;

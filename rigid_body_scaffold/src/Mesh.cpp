@@ -128,6 +128,14 @@ void Mesh::draw(glm::mat4 matModel, glm::mat4 matView, glm::mat4 matProj)
 
     //std::cout << "shader: " << shaderId << std::endl;
 
+    
+    // Zaks added this:
+	// this is for snooker game
+    GLuint colour_loc = glGetUniformLocation(shaderId, "objectColour");
+	glUniform3fv(colour_loc, 1, &objectColour[0]);
+    
+    
+    
     // 2. Set the appropriate uniforms for each shader
     // set the modelling transform  
     GLuint model_loc = glGetUniformLocation(shaderId, "model" );
