@@ -30,7 +30,7 @@ glm::mat4 matProj = glm::ortho(-2.0f,2.0f,-2.0f,2.0f, -2.0f,2.0f);
 glm::vec3 scale = glm::vec3(1.0, 1.0, 1.0);
 
 // camera settings
-glm::vec3 lightPos = glm::vec3(200.0f, 300.0f, 200.0f);
+glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 200.0f);
 glm::vec3 viewPos = glm::vec3(0.0f, 120.0f, 300.0f);
 glm::vec3 viewCenter = glm::vec3(30.0f, 80.0f, 0.0f);
 int wView = 800;
@@ -290,7 +290,7 @@ int main()
 
 
     // setting the background colour, you can change the value
-    glClearColor(0.25f, 0.5f, 0.75f, 1.0f);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     
     glEnable(GL_DEPTH_TEST);
 
