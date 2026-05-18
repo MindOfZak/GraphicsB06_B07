@@ -1,0 +1,12 @@
+{
+  "version": "0.2.1",
+  "defaults": {},
+  "configurations": [
+    {
+      "type": "default",
+      "project": "cloth_sim_scaffold\\CMakeLists.txt",
+      "projectTarget": "run01.exe",
+      "name": "run01.exe"
+    }
+  ]
+}
